@@ -15,6 +15,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -138,6 +139,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private OsuGameBase game { get; set; }
+
+        [Resolved]
+        private YandexStationWorker yandexStationWorker { get; set; }
 
         public GameplayState GameplayState { get; private set; }
 
@@ -860,6 +864,7 @@ namespace osu.Game.Screens.Play
         /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
         private void progressToResults(bool withDelay)
         {
+            yandexStationWorker.NotifyGameplayPaused();
             if (!Configuration.ShowResults)
                 return;
 
@@ -1085,6 +1090,7 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
             lastPauseActionTime = GameplayClockContainer.CurrentTime;
+            yandexStationWorker.NotifyGameplayPaused();
             return true;
         }
 
@@ -1105,6 +1111,7 @@ namespace osu.Game.Screens.Play
             {
                 GameplayClockContainer.Start();
                 IsResuming = false;
+                yandexStationWorker.NotifyGameplayResumed();
             }
         }
 
@@ -1177,6 +1184,8 @@ namespace osu.Game.Screens.Play
 
             if (Configuration.AutomaticallySkipIntro)
                 SkipIntroOverlay.SkipWhenReady();
+
+            yandexStationWorker.NotifyGameplayStarted((GameplayClockContainer.StartTime - DrawableRuleset.Objects.First().StartTime) / 1000);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -1218,6 +1227,8 @@ namespace osu.Game.Screens.Play
             (GameplayClockContainer as MasterGameplayClockContainer)?.StopUsingBeatmapClock();
 
             musicController.ResetTrackAdjustments();
+
+            yandexStationWorker.NotifyGameplayEnded();
 
             fadeOut();
 

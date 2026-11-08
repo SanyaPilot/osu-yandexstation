@@ -505,7 +505,7 @@ namespace osu.Game.Rulesets.UI
         /// <remarks>
         /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
         /// </remarks>
-        internal event Action<HitObject> HitObjectUsageBegan;
+        public event Action<HitObject> HitObjectUsageBegan;
 
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
@@ -513,7 +513,7 @@ namespace osu.Game.Rulesets.UI
         /// <remarks>
         /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
         /// </remarks>
-        internal event Action<HitObject> HitObjectUsageFinished;
+        public event Action<HitObject> HitObjectUsageFinished;
 
         /// <summary>
         /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.

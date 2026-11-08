@@ -12,6 +12,8 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -71,6 +73,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly IBindable<double> SpinsPerMinute = new BindableDouble();
 
         private const double fade_out_duration = 240;
+
+        private const int ticks_per_full_station_ring_spin = 60;
+        private const float rotation_per_station_tick = 360 / ticks_per_full_station_ring_spin;
 
         public DrawableSpinner()
             : this(null)
@@ -281,7 +286,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
 
             if (HandleUserInput)
-                RotationTracker.Tracking = RotationTracker.IsSpinnableTime && !Result.HasResult && correctButtonPressed();
+                RotationTracker.MouseTracking = RotationTracker.IsSpinnableTime && !Result.HasResult && correctButtonPressed();
 
             spinningSample?.Frequency.Value = spinnerFrequencyModulate
                 ? Math.Min(spinning_sample_modulated_max_frequency, spinning_sample_modulated_base_frequency + progressUnclamped * spinning_sample_modulaton_ratio)
@@ -366,6 +371,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     tick.TriggerResult(true);
 
                 completedFullSpins.Value++;
+            }
+        }
+
+        protected override bool OnJoystickPress(JoystickPressEvent e)
+        {
+            RotationTracker.KeyInputTracking = HandleUserInput && !Result.HasResult && RotationTracker.IsSpinnableTime;
+            if (!RotationTracker.KeyInputTracking)
+                return base.OnJoystickPress(e);
+
+            switch (e.Button)
+            {
+                case JoystickButton.Axis64Positive:
+                    RotationTracker.AddRotation(rotation_per_station_tick);
+                    return true;
+                case JoystickButton.Axis64Negative:
+                    RotationTracker.AddRotation(-rotation_per_station_tick);
+                    return true;
+                default:
+                    return base.OnJoystickPress(e);
             }
         }
 

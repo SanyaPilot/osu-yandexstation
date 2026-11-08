@@ -29,6 +29,7 @@ using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Input.Handlers.Touch;
+using osu.Framework.Input.Handlers.YandexStation;
 using osu.Framework.IO.Stores;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -442,6 +443,11 @@ namespace osu.Game
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
             LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
             LocalConfig.LookupKeyBindings = l => KeyBindingStore.GetBindingsStringFor(l);
+
+            YandexStationHandler yandexStationInput = Host.AvailableInputHandlers
+                .OfType<YandexStationHandler>()
+                .SingleOrDefault();
+            dependencies.Cache(yandexStationInput.Worker);
         }
 
         private void updateLanguage() => CurrentLanguage.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, localisationParameters.Value);
@@ -681,6 +687,9 @@ namespace osu.Game
 
                 case MidiHandler:
                     return new InputSubsection(handler);
+
+                case YandexStationHandler yh:
+                    return new YandexStationSettings(yh);
 
                 // return null for handlers that shouldn't have settings.
                 default:

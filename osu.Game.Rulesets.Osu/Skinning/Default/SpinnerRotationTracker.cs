@@ -42,7 +42,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        public bool Tracking { get; set; }
+        public bool Tracking => MouseTracking || KeyInputTracking;
+        public bool MouseTracking { get; set; }
+        public bool KeyInputTracking { get; set; }
 
         /// <summary>
         /// Whether the spinning is spinning at a reasonable speed to be considered visually spinning.
@@ -73,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 if (delta > 180) delta -= 360;
                 if (delta < -180) delta += 360;
 
-                if (Tracking)
+                if (MouseTracking)
                     AddRotation(delta);
 
                 lastAngle = thisAngle;
@@ -112,7 +114,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private void resetState(DrawableHitObject obj)
         {
-            Tracking = false;
+            MouseTracking = false;
+            KeyInputTracking = false;
             IsSpinning.Value = false;
             mousePosition = null;
             lastAngle = null;

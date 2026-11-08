@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -22,6 +23,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -51,6 +53,12 @@ namespace osu.Game.Rulesets.Osu.UI
         public override Quad SkinnableComponentScreenSpaceDrawQuad => playfieldBorder.ScreenSpaceDrawQuad;
 
         private readonly Container judgementAboveHitObjectLayer;
+
+        [Resolved(canBeNull: true)]
+        private GameplayState? gameplayState { get; set; }
+
+        [Resolved]
+        private YandexStationWorker? yandexStationWorker { get; set; }
 
         public OsuPlayfield()
         {
@@ -88,6 +96,9 @@ namespace osu.Game.Rulesets.Osu.UI
             }, onJudgementLoaded));
 
             NewResult += onNewResult;
+
+            HitObjectUsageBegan += onHitObjectUsageBegan;
+            HitObjectUsageFinished += onHitObjectUsageEnded;
         }
 
         private IHitPolicy hitPolicy;
@@ -184,6 +195,18 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             base.OnHitObjectRemoved(hitObject);
             FollowPoints.RemoveFollowPoints((OsuHitObject)hitObject);
+        }
+
+        private void onHitObjectUsageBegan(HitObject hitObject)
+        {
+            if (gameplayState != null && hitObject is Spinner)
+                yandexStationWorker!.DisplaySPM();
+        }
+
+        private void onHitObjectUsageEnded(HitObject hitObject)
+        {
+            if (gameplayState != null && hitObject is Spinner)
+                yandexStationWorker!.DisplayTime();
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
