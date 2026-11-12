@@ -88,10 +88,13 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
+            new KeyBinding(InputKey.JoystickAxis64Negative, GlobalAction.SelectPrevious),
+            new KeyBinding(InputKey.JoystickAxis64Positive, GlobalAction.SelectNext),
 
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
+            new KeyBinding(InputKey.Joystick64, GlobalAction.Select),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
