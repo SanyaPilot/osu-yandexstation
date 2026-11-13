@@ -199,8 +199,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void onHitObjectUsageBegan(HitObject hitObject)
         {
-            if (gameplayState != null && hitObject is Spinner)
-                yandexStationWorker!.DisplaySPM();
+            if (gameplayState != null && hitObject is Spinner spinner)
+                yandexStationWorker!.DisplaySPM(spinner.SpinsRequired);
         }
 
         private void onHitObjectUsageEnded(HitObject hitObject)
